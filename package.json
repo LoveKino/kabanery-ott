@@ -25,7 +25,7 @@
   "homepage": "https://github.com/LoveKino/kabanery-ott#readme",
   "dependencies": {
     "kabanery": "^0.2.16",
-    "ott": "0.0.3"
+    "ott": "0.0.4"
   },
   "devDependencies": {
     "browser-js-env": "^0.1.3",

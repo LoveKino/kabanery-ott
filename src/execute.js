@@ -20,6 +20,7 @@ const PlainView = view(({
 module.exports = (plain, {
   source = {},
   variableMap = {},
+  viewMap = {},
   xmlMap
 } = {}) => {
   return execute(plain, {
@@ -28,6 +29,12 @@ module.exports = (plain, {
 
     xmlMap: Object.assign({
       createNode: (tagName, props, children) => {
+        if (viewMap[tagName]) {
+          return viewMap[tagName]({
+            props,
+            children
+          }).ottView;
+        }
         return PlainView({
           tagName,
           props,
@@ -35,12 +42,11 @@ module.exports = (plain, {
         });
       },
 
-      updateNode: ([tagName, props, children], e) => {
+      updateNode: ([, props, children], e) => {
         if (!e.stop) {
           e.stop = true;
           // update
           e.currentValue.ctx.update([
-            ['tagName', tagName],
             ['props', props],
             ['children', children]
           ]);
@@ -48,6 +54,6 @@ module.exports = (plain, {
 
         return e.currentValue;
       }
-    }, xmlMap)
+    }, xmlMap || {})
   });
 };

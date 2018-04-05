@@ -7,9 +7,10 @@ const {
 const execute = require('./execute');
 
 /**
- *
  * @param ottPlain object
  * @return kabanery view
+ *
+ * TODO check data = {props, children}
  */
 module.exports = (ottPlain, options) => {
   const OttView = view((wrapper, ctx) => {
