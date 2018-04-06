@@ -10,8 +10,10 @@ const assert = require('assert');
 
 const {
   ottView
-} = view(compile('<div id="test">{.text}</div>'))({
-  text: 'txt'
+} = view(compile('<div id="test">{.props.text}</div>'))({
+  props: {
+    text: 'txt'
+  }
 });
 
 mount(ottView, document.body);

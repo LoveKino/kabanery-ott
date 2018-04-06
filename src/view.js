@@ -10,33 +10,41 @@ const execute = require('./execute');
  * @param ottPlain object
  * @return kabanery view
  *
- * TODO check data = {props, children}
  */
 module.exports = (ottPlain, options) => {
-  const OttView = view((wrapper, ctx) => {
+  const OttView = view((data, ctx) => {
     const {
       value,
       updateSource
     } = execute(ottPlain, Object.assign({}, options, {
-      source: wrapper.data,
+      source: data,
       viewCtx: ctx
     }));
 
-    wrapper.updateSource = updateSource;
+
+    // TODO compose multiple updating
+    data.update = (path, value) => {
+      return updateSource(path.split('.'), value);
+    };
 
     return value;
   });
 
-  return (data) => {
-    const wrapper = {
-      data
+  // TODO check data = {props, children}
+  return ({
+    props,
+    children
+  }) => {
+    const data = {
+      props,
+      children
     };
-    const ottView = OttView(wrapper);
+    const ottView = OttView(data);
 
     return {
       ottView,
-      updateSource: (...args) => {
-        wrapper.updateSource && wrapper.updateSource(...args);
+      update: (...args) => {
+        data.update && data.update(...args);
       }
     };
   };
