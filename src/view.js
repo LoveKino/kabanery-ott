@@ -21,7 +21,6 @@ module.exports = (ottPlain, options) => {
       viewCtx: ctx
     }));
 
-
     // TODO compose multiple updating
     data.update = (path, value) => {
       return updateSource(path.split('.'), value);

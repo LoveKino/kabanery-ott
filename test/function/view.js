@@ -71,8 +71,6 @@ describe('view', () => {
     });
   });
 
-
-
   it('compose ott view', (done) => {
     jsdom.env('<p></p>', (err, window) => {
       global.document = window.document;
@@ -121,4 +119,80 @@ describe('view', () => {
       done();
     });
   });
+
+  it('list view', (done) => {
+    jsdom.env('<p></p>', (err, window) => {
+      global.document = window.document;
+      const {
+        ottView
+      } = view(compile('<ul>{map(.props.list, (item) -> <li>{item}</li>)}</ul>'), {
+        variableMap: {
+          map: (list, handler) => list.map(handler)
+        }
+      })({
+        props: {
+          list: [1, 2, 3]
+        }
+      });
+
+      mount(ottView, document.body);
+
+      assert.equal(document.body.innerHTML, '<p></p><ul><li>1</li><li>2</li><li>3</li></ul>');
+
+      done();
+    });
+  });
+
+  it('list view update item', (done) => {
+    jsdom.env('<p></p>', (err, window) => {
+      global.document = window.document;
+      const {
+        ottView,
+        update
+      } = view(compile('<ul>{map(.props.list, (item) -> <li>{item}</li>)}</ul>'), {
+        variableMap: {
+          map: (list, handler) => list.map(handler)
+        }
+      })({
+        props: {
+          list: [1, 2, 3]
+        }
+      });
+
+      mount(ottView, document.body);
+
+      update('props.list.0', 6);
+
+      assert.equal(document.body.innerHTML, '<p></p><ul><li>6</li><li>2</li><li>3</li></ul>');
+
+      done();
+    });
+  });
+
+  it('list view update item2', (done) => {
+    jsdom.env('<p></p>', (err, window) => {
+      global.document = window.document;
+      const {
+        ottView,
+        update
+      } = view(compile('<ul>{map(.props.list, (item, index) -> <li>{.props.list.[index]}</li>)}</ul>'), {
+        variableMap: {
+          map: (list, handler) => list.map(handler)
+        }
+      })({
+        props: {
+          list: [1, 2, 3]
+        }
+      });
+
+      mount(ottView, document.body);
+
+      update('props.list.0', 6);
+
+      assert.equal(document.body.innerHTML, '<p></p><ul><li>6</li><li>2</li><li>3</li></ul>');
+
+      done();
+    });
+  });
+
 });

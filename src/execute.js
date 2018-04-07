@@ -21,7 +21,8 @@ module.exports = (plain, {
   source = {},
   variableMap = {},
   viewMap = {},
-  xmlMap
+  xmlMap,
+  signals
 } = {}) => {
   return execute(plain, {
     source,
@@ -29,17 +30,16 @@ module.exports = (plain, {
 
     xmlMap: Object.assign({
       createNode: (tagName, props, children) => {
-        if (viewMap[tagName]) {
-          return viewMap[tagName]({
-            props,
-            children
-          }).ottView;
-        }
-        return PlainView({
+        const nodeData = {
           tagName,
-          props,
+          props: parseSignal(props, signals),
           children
-        });
+        };
+
+        if (viewMap[tagName]) {
+          return viewMap[tagName](nodeData).ottView;
+        }
+        return PlainView(nodeData);
       },
 
       updateNode: ([, props, children], e) => {
@@ -56,4 +56,15 @@ module.exports = (plain, {
       }
     }, xmlMap || {})
   });
+};
+
+const parseSignal = (oriProps, signals) => {
+  const props = Object.assign({}, oriProps);
+  if (props.signal) {
+    const [fromSignal, toSignal, ...args] = props.signal;
+    props[`on${fromSignal}`] = (e) => {
+      signals[toSignal] && signals[toSignal](...args, e);
+    };
+  }
+  return props;
 };
